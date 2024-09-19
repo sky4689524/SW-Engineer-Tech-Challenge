@@ -1,2 +1,7 @@
 pydicom
 pynetdicom
+fastapi
+uvicorn
+aiohttp
+pandas
+httpx

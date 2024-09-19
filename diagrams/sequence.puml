@@ -1,0 +1,28 @@
+@startuml
+participant PACS as "Orthanc PACS"
+participant StoreSCP as "ModalityStoreSCP"
+participant Collector as "SeriesCollector"
+participant Dispatcher as "SeriesDispatcher"
+participant Server as "FastAPI Server"
+participant DB as "SQLite Database"
+
+PACS -> StoreSCP: Send DICOM Files 
+StoreSCP -> StoreSCP: Add DICOM file to queue
+StoreSCP -> Collector: Forward DICOM Data from Queue
+Collector -> Collector: Collect Instances
+
+alt All Data Received
+    Collector -> Dispatcher: Series Complete (Data Ready)
+    Dispatcher -> Dispatcher: Process Metadata
+    Dispatcher -> Server: Dispatch Metadata (POST)
+    Server -> DB: Store Metadata in SQLite
+    Server --> Dispatcher: Acknowledge Success/Failure
+else Timeout Occurs
+    Dispatcher -> Collector: Check if series is complete
+    Dispatcher -> Dispatcher: Process Metadata
+    Dispatcher -> Server: Dispatch Metadata (POST)
+    Server -> DB: Store Metadata in SQLite
+    Server --> Dispatcher: Acknowledge Success/Failure
+end
+
+@enduml

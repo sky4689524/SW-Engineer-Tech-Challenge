@@ -1,0 +1,15 @@
+@startuml
+package "Modality StoreSCP" {
+    [Orthanc PACS] --> [ModalityStoreSCP] : Send DICOM Files
+}
+
+package "Client" {
+    [ModalityStoreSCP] --> [SeriesCollector] : Pass Queue DICOM Data
+    [SeriesCollector] --> [SeriesDispatcher] : Collect Data
+}
+
+package "Server" {
+    [SeriesDispatcher] --> [FastAPIServer] : Process Data and Dispatch
+    [FastAPIServer] --> [SQLite Database] : Store Metadata
+}
+@enduml
